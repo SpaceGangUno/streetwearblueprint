@@ -1,0 +1,184 @@
+<div class="cart">
+  <div class="container">
+    <div class="cart__header">
+      <h1 class="cart__title">{{ 'cart.general.title' | t }}</h1>
+    </div>
+
+    {% if cart.item_count > 0 %}
+      <form action="/cart" method="post" novalidate class="cart__form">
+        <div class="cart__items">
+          <table class="cart__table">
+            <thead class="cart__table-header">
+              <tr>
+                <th class="cart__table-heading cart__table-heading--product">{{ 'cart.label.product' | t }}</th>
+                <th class="cart__table-heading cart__table-heading--price">{{ 'cart.label.price' | t }}</th>
+                <th class="cart__table-heading cart__table-heading--quantity">{{ 'cart.label.quantity' | t }}</th>
+                <th class="cart__table-heading cart__table-heading--total">{{ 'cart.label.total' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart.items %}
+                <tr class="cart__table-row">
+                  <td class="cart__table-cell cart__table-cell--product">
+                    <div class="cart__product">
+                      <div class="cart__product-image">
+                        <a href="{{ item.url | within: collections.all }}">
+                          {% if item.image != blank %}
+                            <img
+                              src="{{ item.image | image_url: width: 150 }}"
+                              alt="{{ item.image.alt | escape }}"
+                              loading="lazy"
+                              width="150"
+                              height="{{ 150 | divided_by: item.image.aspect_ratio | round }}"
+                              class="cart__product-image-element"
+                            >
+                          {% else %}
+                            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg cart__product-image-element' }}
+                          {% endif %}
+                        </a>
+                      </div>
+                      <div class="cart__product-details">
+                        <h2 class="cart__product-title">
+                          <a href="{{ item.url }}">{{ item.product.title }}</a>
+                        </h2>
+                        {% unless item.product.has_only_default_variant %}
+                          <p class="cart__product-variant">{{ item.variant.title }}</p>
+                        {% endunless %}
+
+                        {% if item.properties.size > 0 %}
+                          <div class="cart__product-properties">
+                            {% for property in item.properties %}
+                              {% unless property.last == blank %}
+                                <div class="cart__product-property">
+                                  <span class="cart__product-property-label">{{ property.first }}:</span>
+                                  <span class="cart__product-property-value">
+                                    {% if property.last contains '/uploads/' %}
+                                      <a href="{{ property.last }}">{{ property.last | split: '/' | last }}</a>
+                                    {% else %}
+                                      {{ property.last }}
+                                    {% endif %}
+                                  </span>
+                                </div>
+                              {% endunless %}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+
+                        <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="cart__product-remove">
+                          {{ 'cart.general.remove' | t }}
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="cart__table-cell cart__table-cell--price">
+                    <span class="cart__price">
+                      {{ item.price | money }}
+                    </span>
+                    {% if item.original_price != item.price %}
+                      <span class="cart__price cart__price--compare">
+                        {{ item.original_price | money }}
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="cart__table-cell cart__table-cell--quantity">
+                    <div class="cart__quantity js-quantity-selector">
+                      <button type="button" class="cart__quantity-button js-quantity-decrease" aria-label="{{ 'cart.general.decrease_quantity' | t }}">
+                        <span aria-hidden="true">-</span>
+                      </button>
+                      <input
+                        type="number"
+                        name="updates[]"
+                        value="{{ item.quantity }}"
+                        min="0"
+                        aria-label="{{ 'cart.general.quantity' | t }}"
+                        class="cart__quantity-input js-quantity-input js-cart-item-quantity"
+                        data-item-key="{{ item.key }}"
+                      >
+                      <button type="button" class="cart__quantity-button js-quantity-increase" aria-label="{{ 'cart.general.increase_quantity' | t }}">
+                        <span aria-hidden="true">+</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="cart__table-cell cart__table-cell--total">
+                    <span class="cart__price">
+                      {{ item.final_line_price | money }}
+                    </span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cart__footer">
+          <div class="cart__footer-left">
+            <div class="cart__note">
+              <label for="CartNote" class="cart__note-label">{{ 'cart.general.note' | t }}</label>
+              <textarea name="note" id="CartNote" class="cart__note-input">{{ cart.note }}</textarea>
+            </div>
+          </div>
+          <div class="cart__footer-right">
+            <div class="cart__subtotal">
+              <span class="cart__subtotal-label">{{ 'cart.general.subtotal' | t }}</span>
+              <span class="cart__subtotal-price">{{ cart.total_price | money }}</span>
+            </div>
+            <div class="cart__taxes">
+              {{ 'cart.general.taxes_and_shipping_at_checkout' | t }}
+            </div>
+            <div class="cart__buttons">
+              <button type="submit" name="update" class="button button--secondary cart__update-button">
+                {{ 'cart.general.update' | t }}
+              </button>
+              <button type="submit" name="checkout" class="button cart__checkout-button">
+                {{ 'cart.general.checkout' | t }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <div class="cart__empty">
+        <p class="cart__empty-text">{{ 'cart.general.empty' | t }}</p>
+        <div class="cart__empty-button">
+          <a href="/collections/all" class="button">{{ 'cart.general.continue_shopping' | t }}</a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Quantity selectors
+    var quantitySelectors = document.querySelectorAll('.js-quantity-selector');
+    
+    quantitySelectors.forEach(function(selector) {
+      var input = selector.querySelector('.js-quantity-input');
+      var decreaseButton = selector.querySelector('.js-quantity-decrease');
+      var increaseButton = selector.querySelector('.js-quantity-increase');
+      
+      if (!input || !decreaseButton || !increaseButton) return;
+      
+      decreaseButton.addEventListener('click', function() {
+        var currentValue = parseInt(input.value);
+        if (currentValue > 0) {
+          input.value = currentValue - 1;
+          input.dispatchEvent(new Event('change'));
+        }
+      });
+      
+      increaseButton.addEventListener('click', function() {
+        var currentValue = parseInt(input.value);
+        input.value = currentValue + 1;
+        input.dispatchEvent(new Event('change'));
+      });
+      
+      input.addEventListener('change', function() {
+        var value = parseInt(input.value);
+        if (isNaN(value) || value < 0) {
+          input.value = 0;
+        }
+      });
+    });
+  });
+</script>
