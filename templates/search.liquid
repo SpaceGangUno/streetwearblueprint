@@ -1,0 +1,115 @@
+<div class="search-page">
+  <div class="container">
+    <div class="search-page__header">
+      <h1 class="search-page__title">{{ 'general.search.title' | t }}</h1>
+      <div class="search-page__form-wrapper">
+        <form action="/search" method="get" role="search" class="search-page__form">
+          <div class="search-page__form-field">
+            <input
+              type="search"
+              name="q"
+              id="SearchInput"
+              value="{{ search.terms | escape }}"
+              placeholder="{{ 'general.search.placeholder' | t }}"
+              class="search-page__form-input"
+              aria-label="{{ 'general.search.placeholder' | t }}"
+            >
+            <button type="submit" class="search-page__form-submit">
+              <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
+              <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-search" viewBox="0 0 24 24">
+                <path d="M21.71 20.29l-5.01-5.01A8.5 8.5 0 1 0 3 10.5a8.5 8.5 0 0 0 13.28 7l5.01 5.01a1 1 0 0 0 1.42-1.42zM5 10.5a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0z"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if search.performed %}
+      <div class="search-page__results">
+        {% if search.results_count > 0 %}
+          <div class="search-page__results-count">
+            {% if search.results_count == 1 %}
+              {{ 'general.search.results_with_count.one' | t: count: search.results_count, terms: search.terms }}
+            {% else %}
+              {{ 'general.search.results_with_count.other' | t: count: search.results_count, terms: search.terms }}
+            {% endif %}
+          </div>
+
+          <div class="search-page__results-grid">
+            {% for item in search.results %}
+              {% if item.object_type == 'product' %}
+                <div class="product-card">
+                  <div class="product-card__image-wrapper">
+                    <a href="{{ item.url }}" class="product-card__image-link">
+                      {% if item.featured_image != blank %}
+                        <img
+                          srcset="{{ item.featured_image | image_url: width: 600 }} 600w,
+                                  {{ item.featured_image | image_url: width: 500 }} 500w,
+                                  {{ item.featured_image | image_url: width: 400 }} 400w,
+                                  {{ item.featured_image | image_url: width: 300 }} 300w"
+                          src="{{ item.featured_image | image_url: width: 400 }}"
+                          sizes="(min-width: 1200px) 300px, (min-width: 750px) 250px, calc(100vw - 30px)"
+                          alt="{{ item.featured_image.alt | escape }}"
+                          loading="lazy"
+                          width="{{ item.featured_image.width }}"
+                          height="{{ item.featured_image.height }}"
+                          class="product-card__image"
+                        >
+                      {% else %}
+                        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg product-card__image' }}
+                      {% endif %}
+                    </a>
+                  </div>
+
+                  <div class="product-card__info">
+                    <h3 class="product-card__title">
+                      <a href="{{ item.url }}">{{ item.title }}</a>
+                    </h3>
+                    
+                    <div class="product-card__price">
+                      {% if item.compare_at_price > item.price %}
+                        <span class="product-card__price-item product-card__price--sale">{{ item.price | money }}</span>
+                        <span class="product-card__price-item product-card__price--compare">{{ item.compare_at_price | money }}</span>
+                      {% else %}
+                        <span class="product-card__price-item">{{ item.price | money }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <div class="search-page__result-item">
+                  <h3 class="search-page__result-title">
+                    <a href="{{ item.url }}">{{ item.title }}</a>
+                  </h3>
+                  {% if item.object_type == 'article' %}
+                    <p class="search-page__result-type">{{ 'blogs.article.blog' | t }}: {{ item.object.blog.title }}</p>
+                  {% else %}
+                    <p class="search-page__result-type">{{ item.object_type | capitalize }}</p>
+                  {% endif %}
+                  <div class="search-page__result-excerpt rte">
+                    {% if item.object_type == 'article' %}
+                      {{ item.content | strip_html | truncatewords: 50 }}
+                    {% elsif item.object_type == 'page' %}
+                      {{ item.content | strip_html | truncatewords: 50 }}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          {% if paginate.pages > 1 %}
+            <div class="search-page__pagination">
+              {{ paginate | default_pagination }}
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="search-page__no-results">
+            <p>{{ 'general.search.no_results_html' | t: terms: search.terms }}</p>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
