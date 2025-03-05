@@ -1,0 +1,98 @@
+<div class="blog">
+  <div class="container">
+    <div class="blog__header">
+      <h1 class="blog__title">{{ blog.title }}</h1>
+      
+      {% if blog.all_tags.size > 0 %}
+        <div class="blog__tags">
+          <span class="blog__tags-label">{{ 'blogs.article.all_topics' | t }}:</span>
+          <ul class="blog__tags-list">
+            <li class="blog__tags-item{% unless current_tags %} blog__tags-item--active{% endunless %}">
+              <a href="{{ blog.url }}" class="blog__tags-link">{{ 'blogs.article.all_topics' | t }}</a>
+            </li>
+            {% for tag in blog.all_tags %}
+              <li class="blog__tags-item{% if current_tags contains tag %} blog__tags-item--active{% endif %}">
+                <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="blog__tags-link">{{ tag }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="blog__articles">
+      {% for article in blog.articles %}
+        <div class="article-card">
+          {% if article.image %}
+            <div class="article-card__image-wrapper">
+              <a href="{{ article.url }}" class="article-card__image-link">
+                <img
+                  srcset="{{ article.image | image_url: width: 800 }} 800w,
+                          {{ article.image | image_url: width: 600 }} 600w,
+                          {{ article.image | image_url: width: 400 }} 400w"
+                  src="{{ article.image | image_url: width: 600 }}"
+                  sizes="(min-width: 1200px) 600px, (min-width: 750px) 500px, calc(100vw - 30px)"
+                  alt="{{ article.image.alt | escape }}"
+                  loading="lazy"
+                  width="{{ article.image.width }}"
+                  height="{{ article.image.height }}"
+                  class="article-card__image"
+                >
+              </a>
+            </div>
+          {% endif %}
+
+          <div class="article-card__content">
+            <h2 class="article-card__title">
+              <a href="{{ article.url }}">{{ article.title }}</a>
+            </h2>
+
+            <div class="article-card__meta">
+              {% if section.settings.show_author %}
+                <span class="article-card__author">{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+              {% endif %}
+              
+              <span class="article-card__date">{{ article.published_at | time_tag: format: 'date' }}</span>
+              
+              {% if article.tags.size > 0 and section.settings.show_tags %}
+                <span class="article-card__tags">
+                  {% for tag in article.tags %}
+                    <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="article-card__tag">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
+                  {% endfor %}
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="article-card__excerpt rte">
+              {% if article.excerpt.size > 0 %}
+                {{ article.excerpt }}
+              {% else %}
+                {{ article.content | strip_html | truncatewords: 30 }}
+              {% endif %}
+            </div>
+
+            <div class="article-card__footer">
+              <a href="{{ article.url }}" class="article-card__read-more">{{ 'blogs.article.read_more' | t }}</a>
+              
+              {% if blog.comments_enabled? and article.comments_count > 0 %}
+                <span class="article-card__comments-count">
+                  {% if article.comments_count == 1 %}
+                    {{ 'blogs.comments.comments_with_count.one' | t: count: article.comments_count }}
+                  {% else %}
+                    {{ 'blogs.comments.comments_with_count.other' | t: count: article.comments_count }}
+                  {% endif %}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      <div class="blog__pagination">
+        {{ paginate | default_pagination }}
+      </div>
+    {% endif %}
+  </div>
+</div>

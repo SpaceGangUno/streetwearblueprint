@@ -1,0 +1,143 @@
+<div class="article">
+  <div class="container">
+    <article class="article__content">
+      <header class="article__header">
+        <h1 class="article__title">{{ article.title }}</h1>
+        
+        <div class="article__meta">
+          {% if section.settings.show_author %}
+            <span class="article__author">{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+          {% endif %}
+          
+          <span class="article__date">{{ article.published_at | time_tag: format: 'date' }}</span>
+          
+          {% if article.tags.size > 0 and section.settings.show_tags %}
+            <span class="article__tags">
+              {% for tag in article.tags %}
+                <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="article__tag">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
+              {% endfor %}
+            </span>
+          {% endif %}
+        </div>
+      </header>
+
+      {% if article.image %}
+        <div class="article__featured-image-wrapper">
+          <img
+            srcset="{{ article.image | image_url: width: 1200 }} 1200w,
+                    {{ article.image | image_url: width: 900 }} 900w,
+                    {{ article.image | image_url: width: 600 }} 600w"
+            src="{{ article.image | image_url: width: 900 }}"
+            sizes="(min-width: 1200px) 1200px, (min-width: 750px) 900px, calc(100vw - 30px)"
+            alt="{{ article.image.alt | escape }}"
+            loading="lazy"
+            width="{{ article.image.width }}"
+            height="{{ article.image.height }}"
+            class="article__featured-image"
+          >
+        </div>
+      {% endif %}
+
+      <div class="article__body rte">
+        {{ article.content }}
+      </div>
+
+      {% if blog.comments_enabled? %}
+        <div class="article__comments">
+          <h2 class="article__comments-title">
+            {% if article.comments_count == 0 %}
+              {{ 'blogs.comments.title' | t }}
+            {% else %}
+              {% if article.comments_count == 1 %}
+                {{ 'blogs.comments.comments_with_count.one' | t: count: article.comments_count }}
+              {% else %}
+                {{ 'blogs.comments.comments_with_count.other' | t: count: article.comments_count }}
+              {% endif %}
+            {% endif %}
+          </h2>
+
+          {% if article.comments_count > 0 %}
+            <div class="article__comments-list">
+              {% paginate article.comments by 5 %}
+                {% for comment in article.comments %}
+                  <div class="article__comment" id="{{ comment.id }}">
+                    <div class="article__comment-content">
+                      {{ comment.content }}
+                    </div>
+                    <div class="article__comment-meta">
+                      <span class="article__comment-author">{{ comment.author }}</span>
+                      <span class="article__comment-date">{{ comment.created_at | time_tag: format: 'date' }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
+
+                {% if paginate.pages > 1 %}
+                  <div class="article__comments-pagination">
+                    {{ paginate | default_pagination }}
+                  </div>
+                {% endif %}
+              {% endpaginate %}
+            </div>
+          {% endif %}
+
+          <div class="article__comment-form">
+            {% form 'new_comment', article %}
+              <h3 class="article__comment-form-title">{{ 'blogs.comments.title' | t }}</h3>
+
+              {{ form.errors | default_errors }}
+
+              <div class="article__comment-form-fields">
+                <div class="article__comment-form-field">
+                  <label for="CommentAuthor" class="article__comment-form-label">{{ 'blogs.comments.name' | t }}</label>
+                  <input 
+                    type="text" 
+                    name="comment[author]" 
+                    id="CommentAuthor" 
+                    class="article__comment-form-input" 
+                    value="{{ form.author }}" 
+                    autocapitalize="words"
+                  >
+                </div>
+
+                <div class="article__comment-form-field">
+                  <label for="CommentEmail" class="article__comment-form-label">{{ 'blogs.comments.email' | t }}</label>
+                  <input 
+                    type="email" 
+                    name="comment[email]" 
+                    id="CommentEmail" 
+                    class="article__comment-form-input" 
+                    value="{{ form.email }}" 
+                    autocorrect="off" 
+                    autocapitalize="off"
+                  >
+                </div>
+
+                <div class="article__comment-form-field article__comment-form-field--full">
+                  <label for="CommentBody" class="article__comment-form-label">{{ 'blogs.comments.message' | t }}</label>
+                  <textarea 
+                    name="comment[body]" 
+                    id="CommentBody" 
+                    class="article__comment-form-textarea" 
+                    required
+                  >{{ form.body }}</textarea>
+                </div>
+
+                <div class="article__comment-form-field article__comment-form-field--full">
+                  <button type="submit" class="button article__comment-form-submit">{{ 'blogs.comments.post' | t }}</button>
+                </div>
+
+                {% if blog.moderated? %}
+                  <p class="article__comment-moderation">{{ 'blogs.comments.moderated' | t }}</p>
+                {% endif %}
+              </div>
+            {% endform %}
+          </div>
+        </div>
+      {% endif %}
+    </article>
+
+    <div class="article__footer">
+      <a href="{{ blog.url }}" class="article__back-link">{{ 'blogs.article.back_to_blog' | t: title: blog.title }}</a>
+    </div>
+  </div>
+</div>
