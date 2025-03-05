@@ -1,0 +1,75 @@
+<div class="customer-register">
+  <div class="container">
+    <div class="customer-register__header">
+      <h1 class="customer-register__title">{{ 'customer.register.title' | t }}</h1>
+    </div>
+
+    <div class="customer-register__content">
+      {% form 'create_customer' %}
+        {{ form.errors | default_errors }}
+
+        <div class="customer-register__fields">
+          <div class="customer-register__field">
+            <label for="FirstName" class="customer-register__label">{{ 'customer.register.first_name' | t }}</label>
+            <input 
+              type="text" 
+              name="customer[first_name]" 
+              id="FirstName" 
+              class="customer-register__input"
+              {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+              autocomplete="given-name"
+              autofocus
+            >
+          </div>
+
+          <div class="customer-register__field">
+            <label for="LastName" class="customer-register__label">{{ 'customer.register.last_name' | t }}</label>
+            <input 
+              type="text" 
+              name="customer[last_name]" 
+              id="LastName" 
+              class="customer-register__input"
+              {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+              autocomplete="family-name"
+            >
+          </div>
+
+          <div class="customer-register__field">
+            <label for="CustomerEmail" class="customer-register__label">{{ 'customer.register.email' | t }}</label>
+            <input 
+              type="email" 
+              name="customer[email]" 
+              id="CustomerEmail" 
+              class="customer-register__input"
+              {% if form.email %}value="{{ form.email }}"{% endif %}
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              required
+            >
+          </div>
+
+          <div class="customer-register__field">
+            <label for="CustomerPassword" class="customer-register__label">{{ 'customer.register.password' | t }}</label>
+            <input 
+              type="password" 
+              name="customer[password]" 
+              id="CustomerPassword" 
+              class="customer-register__input"
+              autocomplete="new-password"
+              required
+            >
+          </div>
+
+          <div class="customer-register__submit">
+            <button type="submit" class="button customer-register__button">{{ 'customer.register.submit' | t }}</button>
+          </div>
+
+          <div class="customer-register__login-link">
+            <a href="{{ routes.account_login_url }}" class="customer-register__login-link-text">{{ 'layout.customer.log_in' | t }}</a>
+          </div>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+</div>
