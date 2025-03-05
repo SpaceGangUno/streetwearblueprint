@@ -1,0 +1,130 @@
+<div class="customer-order">
+  <div class="container">
+    <div class="customer-order__header">
+      <h1 class="customer-order__title">{{ 'customer.order.title' | t: name: order.name }}</h1>
+      <a href="{{ routes.account_url }}" class="customer-order__return">{{ 'customer.account.return' | t }}</a>
+    </div>
+
+    <div class="customer-order__content">
+      <div class="customer-order__meta">
+        <p class="customer-order__date">{{ 'customer.order.date_html' | t: date: order.created_at | time_tag: format: 'date' }}</p>
+
+        {% if order.cancelled %}
+          <div class="customer-order__cancelled">
+            <p>{{ 'customer.order.cancelled_html' | t: date: order.cancelled_at | time_tag: format: 'date' }}</p>
+            <p>{{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason }}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="customer-order__details">
+        <div class="customer-order__addresses">
+          <div class="customer-order__address">
+            <h2 class="customer-order__address-title">{{ 'customer.order.billing_address' | t }}</h2>
+            <p>{{ order.billing_address.name }}</p>
+            <p>{{ order.billing_address.street }}</p>
+            <p>{{ order.billing_address.city }}, {{ order.billing_address.province_code }} {{ order.billing_address.zip }}</p>
+            <p>{{ order.billing_address.country }}</p>
+            {% if order.billing_address.phone %}
+              <p>{{ order.billing_address.phone }}</p>
+            {% endif %}
+          </div>
+
+          <div class="customer-order__address">
+            <h2 class="customer-order__address-title">{{ 'customer.order.shipping_address' | t }}</h2>
+            <p>{{ order.shipping_address.name }}</p>
+            <p>{{ order.shipping_address.street }}</p>
+            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.province_code }} {{ order.shipping_address.zip }}</p>
+            <p>{{ order.shipping_address.country }}</p>
+            {% if order.shipping_address.phone %}
+              <p>{{ order.shipping_address.phone }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="customer-order__status">
+          <div class="customer-order__status-item">
+            <h2 class="customer-order__status-title">{{ 'customer.order.payment_status' | t }}</h2>
+            <p>{{ order.financial_status_label }}</p>
+          </div>
+
+          <div class="customer-order__status-item">
+            <h2 class="customer-order__status-title">{{ 'customer.order.fulfillment_status' | t }}</h2>
+            <p>{{ order.fulfillment_status_label }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="customer-order__items">
+        <table class="customer-order__items-table">
+          <thead>
+            <tr>
+              <th>{{ 'customer.order.product' | t }}</th>
+              <th>{{ 'customer.order.sku' | t }}</th>
+              <th>{{ 'customer.order.price' | t }}</th>
+              <th>{{ 'customer.order.quantity' | t }}</th>
+              <th>{{ 'customer.order.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for line_item in order.line_items %}
+              <tr>
+                <td>
+                  <div class="customer-order__product">
+                    <div class="customer-order__product-title">
+                      {{ line_item.title }}
+                      {% if line_item.fulfillment %}
+                        <div class="customer-order__fulfillment">
+                          {% assign fulfillment_status = line_item.fulfillment.status_label %}
+                          {{ 'customer.order.fulfilled_at_html' | t: date: line_item.fulfillment.created_at | time_tag: format: 'date' }}
+                          {% if line_item.fulfillment.tracking_number %}
+                            <a href="{{ line_item.fulfillment.tracking_url }}">{{ 'customer.order.track_shipment' | t }}</a>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+                    {% if line_item.variant.title != 'Default Title' %}
+                      <div class="customer-order__product-variant">{{ line_item.variant.title }}</div>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>{{ line_item.sku }}</td>
+                <td>{{ line_item.price | money }}</td>
+                <td>{{ line_item.quantity }}</td>
+                <td>{{ line_item.quantity | times: line_item.price | money }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4">{{ 'customer.order.subtotal' | t }}</td>
+              <td>{{ order.line_items_subtotal_price | money }}</td>
+            </tr>
+            {% for discount in order.discounts %}
+              <tr>
+                <td colspan="4">{{ 'customer.order.discount' | t }} ({{ discount.code }})</td>
+                <td>-{{ discount.amount | money }}</td>
+              </tr>
+            {% endfor %}
+            {% for shipping_method in order.shipping_methods %}
+              <tr>
+                <td colspan="4">{{ 'customer.order.shipping' | t }} ({{ shipping_method.title }})</td>
+                <td>{{ shipping_method.price | money }}</td>
+              </tr>
+            {% endfor %}
+            {% for tax_line in order.tax_lines %}
+              <tr>
+                <td colspan="4">{{ 'customer.order.tax' | t }} ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</td>
+                <td>{{ tax_line.price | money }}</td>
+              </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="4"><strong>{{ 'customer.order.total' | t }}</strong></td>
+              <td><strong>{{ order.total_price | money }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
