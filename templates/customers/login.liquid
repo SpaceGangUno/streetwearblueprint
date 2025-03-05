@@ -1,0 +1,126 @@
+<div class="customer-login">
+  <div class="container">
+    <div class="customer-login__header">
+      <h1 class="customer-login__title">{{ 'customer.login.title' | t }}</h1>
+    </div>
+
+    <div class="customer-login__content">
+      <div class="customer-login__login">
+        {% form 'customer_login' %}
+          {{ form.errors | default_errors }}
+
+          <div class="customer-login__field">
+            <label for="CustomerEmail" class="customer-login__label">{{ 'customer.login.email' | t }}</label>
+            <input 
+              type="email" 
+              name="customer[email]" 
+              id="CustomerEmail" 
+              class="customer-login__input"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              autofocus
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+            >
+          </div>
+
+          <div class="customer-login__field">
+            <label for="CustomerPassword" class="customer-login__label">{{ 'customer.login.password' | t }}</label>
+            <input 
+              type="password" 
+              name="customer[password]" 
+              id="CustomerPassword" 
+              class="customer-login__input"
+              autocomplete="current-password"
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+            >
+          </div>
+
+          <div class="customer-login__forgot-password">
+            <a href="#recover" id="RecoverPassword">{{ 'customer.login.forgot_password' | t }}</a>
+          </div>
+
+          <div class="customer-login__submit">
+            <button type="submit" class="button customer-login__button">{{ 'customer.login.sign_in' | t }}</button>
+          </div>
+
+          <div class="customer-login__create-account">
+            <a href="{{ routes.account_register_url }}" class="customer-login__create-account-link">{{ 'layout.customer.create_account' | t }}</a>
+          </div>
+        {% endform %}
+      </div>
+
+      <div id="RecoverPasswordForm" class="customer-login__recover-password-form" style="display: none;">
+        <div class="customer-login__recover-password-header">
+          <h2 class="customer-login__recover-password-title">{{ 'customer.recover_password.title' | t }}</h2>
+          <p class="customer-login__recover-password-text">{{ 'customer.recover_password.subtext' | t }}</p>
+        </div>
+
+        {% form 'recover_customer_password' %}
+          {{ form.errors | default_errors }}
+
+          {% if form.posted_successfully? %}
+            <div class="customer-login__recover-success">
+              <p>{{ 'customer.recover_password.success' | t }}</p>
+            </div>
+          {% endif %}
+
+          <div class="customer-login__field">
+            <label for="RecoverEmail" class="customer-login__label">{{ 'customer.recover_password.email' | t }}</label>
+            <input 
+              type="email" 
+              name="email" 
+              id="RecoverEmail" 
+              class="customer-login__input"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+            >
+          </div>
+
+          <div class="customer-login__submit">
+            <button type="submit" class="button customer-login__button">{{ 'customer.recover_password.submit' | t }}</button>
+          </div>
+
+          <div class="customer-login__cancel-recover">
+            <a href="#" id="HideRecoverPasswordLink">{{ 'customer.recover_password.cancel' | t }}</a>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide recover password form
+    const recoverPasswordForm = document.getElementById('RecoverPasswordForm');
+    const recoverPasswordLink = document.getElementById('RecoverPassword');
+    const hideRecoverPasswordLink = document.getElementById('HideRecoverPasswordLink');
+    
+    if (recoverPasswordForm && recoverPasswordLink && hideRecoverPasswordLink) {
+      // Show recover password form
+      recoverPasswordLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        recoverPasswordForm.style.display = 'block';
+      });
+      
+      // Hide recover password form
+      hideRecoverPasswordLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        recoverPasswordForm.style.display = 'none';
+      });
+    }
+    
+    // Show recover form if URL contains #recover
+    if (window.location.hash === '#recover') {
+      if (recoverPasswordForm) {
+        recoverPasswordForm.style.display = 'block';
+      }
+    }
+  });
+</script>

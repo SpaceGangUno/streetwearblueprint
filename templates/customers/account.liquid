@@ -1,0 +1,65 @@
+<div class="customer-account">
+  <div class="container">
+    <div class="customer-account__header">
+      <h1 class="customer-account__title">{{ 'customer.account.title' | t }}</h1>
+      <a href="{{ routes.account_logout_url }}" class="customer-account__logout">{{ 'layout.customer.log_out' | t }}</a>
+    </div>
+
+    <div class="customer-account__content">
+      <div class="customer-account__orders">
+        <h2 class="customer-account__section-title">{{ 'customer.orders.title' | t }}</h2>
+
+        {% paginate customer.orders by 5 %}
+          {% if customer.orders.size > 0 %}
+            <table class="customer-account__orders-table">
+              <thead>
+                <tr>
+                  <th>{{ 'customer.orders.order_number' | t }}</th>
+                  <th>{{ 'customer.orders.date' | t }}</th>
+                  <th>{{ 'customer.orders.payment_status' | t }}</th>
+                  <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+                  <th>{{ 'customer.orders.total' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in customer.orders %}
+                  <tr>
+                    <td>
+                      <a href="{{ order.customer_url }}">{{ 'customer.orders.order_number_link' | t: number: order.name }}</a>
+                    </td>
+                    <td>{{ order.created_at | time_tag: format: 'date' }}</td>
+                    <td>{{ order.financial_status_label }}</td>
+                    <td>{{ order.fulfillment_status_label }}</td>
+                    <td>{{ order.total_price | money }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            {% if paginate.pages > 1 %}
+              <div class="customer-account__pagination">
+                {{ paginate | default_pagination }}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="customer-account__no-orders">{{ 'customer.orders.none' | t }}</p>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+
+      <div class="customer-account__details">
+        <h2 class="customer-account__section-title">{{ 'customer.account.details' | t }}</h2>
+
+        <div class="customer-account__details-content">
+          <p>{{ customer.name }}</p>
+          <p>{{ customer.email }}</p>
+          
+          <div class="customer-account__addresses">
+            <h3 class="customer-account__subsection-title">{{ 'customer.addresses.title' | t }}</h3>
+            <a href="{{ routes.account_addresses_url }}" class="customer-account__view-addresses">{{ 'customer.account.view_addresses' | t }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
