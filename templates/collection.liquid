@@ -1,0 +1,211 @@
+<div class="collection">
+  <div class="container">
+    <div class="collection-header">
+      <h1 class="collection-header__title">{{ collection.title }}</h1>
+      {% if collection.description != blank %}
+        <div class="collection-header__description rte">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="collection-toolbar">
+      <div class="collection-toolbar__item collection-toolbar__item--count">
+        <span class="collection-toolbar__count">
+          {% if collection.products_count == 1 %}
+            {{ 'collections.general.item_count.one' | t: count: collection.products_count }}
+          {% else %}
+            {{ 'collections.general.item_count.other' | t: count: collection.products_count }}
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="collection-toolbar__item collection-toolbar__item--sort">
+        <label for="SortBy" class="collection-toolbar__label">{{ 'collections.sorting.title' | t }}</label>
+        <select name="sort_by" id="SortBy" class="collection-toolbar__select js-sort-by">
+          <option value="manual" {% if collection.sort_by == 'manual' %}selected="selected"{% endif %}>{{ 'collections.sorting.featured' | t }}</option>
+          <option value="best-selling" {% if collection.sort_by == 'best-selling' %}selected="selected"{% endif %}>{{ 'collections.sorting.best_selling' | t }}</option>
+          <option value="title-ascending" {% if collection.sort_by == 'title-ascending' %}selected="selected"{% endif %}>{{ 'collections.sorting.az' | t }}</option>
+          <option value="title-descending" {% if collection.sort_by == 'title-descending' %}selected="selected"{% endif %}>{{ 'collections.sorting.za' | t }}</option>
+          <option value="price-ascending" {% if collection.sort_by == 'price-ascending' %}selected="selected"{% endif %}>{{ 'collections.sorting.price_ascending' | t }}</option>
+          <option value="price-descending" {% if collection.sort_by == 'price-descending' %}selected="selected"{% endif %}>{{ 'collections.sorting.price_descending' | t }}</option>
+          <option value="created-descending" {% if collection.sort_by == 'created-descending' %}selected="selected"{% endif %}>{{ 'collections.sorting.date_descending' | t }}</option>
+          <option value="created-ascending" {% if collection.sort_by == 'created-ascending' %}selected="selected"{% endif %}>{{ 'collections.sorting.date_ascending' | t }}</option>
+        </select>
+      </div>
+
+      <div class="collection-toolbar__item collection-toolbar__item--filter">
+        <button type="button" class="collection-toolbar__filter-button js-filter-toggle">
+          {{ 'collections.filtering.title' | t }}
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-filter" viewBox="0 0 24 24">
+            <path d="M3 6h18M7 12h10m-6 6h2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="collection-content">
+      {% if collection.products.size > 0 %}
+        <div class="collection-grid">
+          {% for product in collection.products %}
+            <div class="product-card">
+              <div class="product-card__image-wrapper">
+                <a href="{{ product.url | within: collection }}" class="product-card__image-link">
+                  {% if product.featured_image != blank %}
+                    <img
+                      srcset="{{ product.featured_image | image_url: width: 600 }} 600w,
+                              {{ product.featured_image | image_url: width: 500 }} 500w,
+                              {{ product.featured_image | image_url: width: 400 }} 400w,
+                              {{ product.featured_image | image_url: width: 300 }} 300w"
+                      src="{{ product.featured_image | image_url: width: 400 }}"
+                      sizes="(min-width: 1200px) 300px, (min-width: 750px) 250px, calc(100vw - 30px)"
+                      alt="{{ product.featured_image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ product.featured_image.width }}"
+                      height="{{ product.featured_image.height }}"
+                      class="product-card__image"
+                    >
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg product-card__image' }}
+                  {% endif %}
+                </a>
+                
+                <button type="button" class="product-card__quick-view-button" data-product-handle="{{ product.handle }}">
+                  Quick view
+                </button>
+              </div>
+
+              <div class="product-card__info">
+                <h3 class="product-card__title">
+                  <a href="{{ product.url | within: collection }}">{{ product.title }}</a>
+                </h3>
+                
+                <div class="product-card__price">
+                  {% if product.compare_at_price > product.price %}
+                    <span class="product-card__price-item product-card__price--sale">{{ product.price | money }}</span>
+                    <span class="product-card__price-item product-card__price--compare">{{ product.compare_at_price | money }}</span>
+                  {% else %}
+                    <span class="product-card__price-item">{{ product.price | money }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          <div class="collection-pagination">
+            {{ paginate | default_pagination }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="collection-empty">
+          <p class="collection-empty__message">{{ 'collections.general.no_matches' | t }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="filter-drawer js-filter-drawer">
+  <div class="filter-drawer__inner">
+    <div class="filter-drawer__header">
+      <h2 class="filter-drawer__title">{{ 'collections.filtering.title' | t }}</h2>
+      <button type="button" class="filter-drawer__close js-filter-close">
+        <span class="visually-hidden">{{ 'collections.filtering.close' | t }}</span>
+        <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close" viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="filter-drawer__content">
+      <form class="filter-form">
+        {% for filter in collection.filters %}
+          <div class="filter-group">
+            <div class="filter-group__header">
+              <h3 class="filter-group__title">{{ filter.label }}</h3>
+            </div>
+
+            <div class="filter-group__content">
+              {% case filter.type %}
+                {% when 'list' %}
+                  <ul class="filter-group__list">
+                    {% for filter_value in filter.values %}
+                      <li class="filter-group__item">
+                        <label class="filter-group__checkbox">
+                          <input
+                            type="checkbox"
+                            name="{{ filter_value.param_name }}"
+                            value="{{ filter_value.value }}"
+                            {% if filter_value.active %}checked{% endif %}
+                            class="filter-group__checkbox-input"
+                          >
+                          <span class="filter-group__checkbox-label">
+                            {{ filter_value.label }}
+                            <span class="filter-group__checkbox-count">{{ filter_value.count }}</span>
+                          </span>
+                        </label>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% when 'price_range' %}
+                  <div class="filter-group__price-range">
+                    <div class="filter-group__price-inputs">
+                      <div class="filter-group__price-input">
+                        <label for="filter-min-price" class="filter-group__price-label">{{ 'collections.filtering.from' | t }}</label>
+                        <input
+                          type="number"
+                          name="{{ filter.min_value.param_name }}"
+                          id="filter-min-price"
+                          class="filter-group__price-field"
+                          placeholder="{{ filter.min_value.placeholder | money_without_currency }}"
+                          min="0"
+                          max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                          {% if filter.min_value.value %}value="{{ filter.min_value.value | money_without_currency }}"{% endif %}
+                        >
+                      </div>
+                      <div class="filter-group__price-input">
+                        <label for="filter-max-price" class="filter-group__price-label">{{ 'collections.filtering.to' | t }}</label>
+                        <input
+                          type="number"
+                          name="{{ filter.max_value.param_name }}"
+                          id="filter-max-price"
+                          class="filter-group__price-field"
+                          placeholder="{{ filter.max_value.placeholder | money_without_currency }}"
+                          min="0"
+                          max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                          {% if filter.max_value.value %}value="{{ filter.max_value.value | money_without_currency }}"{% endif %}
+                        >
+                      </div>
+                    </div>
+                  </div>
+              {% endcase %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="filter-drawer__footer">
+          <button type="submit" class="button filter-drawer__apply-button">{{ 'collections.filtering.apply' | t }}</button>
+          <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="filter-drawer__clear-button">{{ 'collections.filtering.clear' | t }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="filter-overlay js-filter-overlay"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sort by functionality
+    var sortBySelect = document.querySelector('.js-sort-by');
+    if (sortBySelect) {
+      sortBySelect.addEventListener('change', function() {
+        var url = new URL(window.location.href);
+        url.searchParams.set('sort_by', this.value);
+        window.location.href = url.href;
+      });
+    }
+  });
+</script>

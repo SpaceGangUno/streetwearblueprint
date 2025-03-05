@@ -1,0 +1,178 @@
+{% assign current_product = product %}
+{% assign current_variant = current_product.selected_or_first_available_variant %}
+
+<div class="product">
+  <div class="container">
+    <div class="product__grid">
+      <div class="product__media-column">
+        <div class="product__media js-product-gallery">
+          {% if product.media.size > 0 %}
+            <div class="product__featured-media-wrapper">
+              <img
+                srcset="{% for width in '600,800,1000,1200,1400,1600' %}{{ product.featured_media | image_url: width: width }} {{ width }}w,{% endfor %}"
+                src="{{ product.featured_media | image_url: width: 1000 }}"
+                sizes="(min-width: 1200px) 600px, (min-width: 750px) 550px, calc(100vw - 30px)"
+                alt="{{ product.featured_media.alt | escape }}"
+                loading="lazy"
+                width="{{ product.featured_media.width }}"
+                height="{{ product.featured_media.height }}"
+                class="product__featured-media js-product-featured-image"
+              >
+            </div>
+
+            {% if product.media.size > 1 %}
+              <div class="product__media-list">
+                {% for media in product.media %}
+                  <div class="product__media-item{% if forloop.first %} product__media-item--active{% endif %}">
+                    <button
+                      class="product__media-button js-product-thumbnail"
+                      data-src="{{ media | image_url: width: 1000 }}"
+                      data-srcset="{% for width in '600,800,1000,1200,1400,1600' %}{{ media | image_url: width: width }} {{ width }}w,{% endfor %}"
+                      data-alt="{{ media.alt | escape }}"
+                      {% if forloop.first %}aria-current="true"{% endif %}
+                    >
+                      <img
+                        src="{{ media | image_url: width: 150 }}"
+                        alt="{{ media.alt | escape }}"
+                        loading="lazy"
+                        width="{{ media.width }}"
+                        height="{{ media.height }}"
+                        class="product__media-thumbnail"
+                      >
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="product__featured-media-wrapper product__featured-media-wrapper--placeholder">
+              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg product__featured-media' }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="product__info-column">
+        <div class="product__info">
+          <h1 class="product__title">{{ product.title }}</h1>
+
+          <div class="product__price">
+            <span class="product__price-item js-product-price">
+              {{ current_variant.price | money }}
+            </span>
+            {% if current_variant.compare_at_price > current_variant.price %}
+              <span class="product__price-item product__price-item--compare js-product-compare-price">
+                {{ current_variant.compare_at_price | money }}
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="product__description rte">
+            {{ product.description }}
+          </div>
+
+          <form method="post" action="/cart/add" id="product-form-{{ product.id }}" class="product__form js-product-form">
+            <input type="hidden" name="id" value="{{ current_variant.id }}" class="js-variant-id-input">
+
+            {% if product.has_only_default_variant == false %}
+              <div class="product__variants">
+                {% for option in product.options_with_values %}
+                  <div class="product__option">
+                    <label class="product__option-label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+                      {{ option.name }}
+                    </label>
+                    <select
+                      id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                      class="product__option-select js-variant-selector"
+                      name="options[{{ option.name | escape }}]"
+                    >
+                      {% for value in option.values %}
+                        <option
+                          value="{{ value | escape }}"
+                          {% if option.selected_value == value %}selected="selected"{% endif %}
+                        >
+                          {{ value }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="product__quantity js-quantity-selector">
+              <label class="product__quantity-label" for="Quantity-{{ product.id }}">
+                {{ 'products.product.quantity' | t }}
+              </label>
+              <div class="product__quantity-wrapper">
+                <button type="button" class="product__quantity-button js-quantity-decrease" aria-label="{{ 'products.product.decrease_quantity' | t }}">
+                  <span aria-hidden="true">-</span>
+                </button>
+                <input
+                  type="number"
+                  id="Quantity-{{ product.id }}"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  class="product__quantity-input js-quantity-input"
+                  aria-label="{{ 'products.product.quantity' | t }}"
+                >
+                <button type="button" class="product__quantity-button js-quantity-increase" aria-label="{{ 'products.product.increase_quantity' | t }}">
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="product__submit">
+              <button
+                type="submit"
+                name="add"
+                class="button button--full-width product__add-to-cart js-add-to-cart"
+                {% unless current_variant.available %}disabled="disabled"{% endunless %}
+              >
+                <span class="product__add-to-cart-text">
+                  {% if current_variant.available %}
+                    {{ 'products.product.add_to_cart' | t }}
+                  {% else %}
+                    {{ 'products.product.sold_out' | t }}
+                  {% endif %}
+                </span>
+              </button>
+            </div>
+          </form>
+
+          <div class="product__meta">
+            {% if product.vendor != blank %}
+              <div class="product__vendor">
+                <span class="product__meta-label">{{ 'products.product.vendor' | t }}:</span>
+                <span class="product__meta-value">{{ product.vendor }}</span>
+              </div>
+            {% endif %}
+
+            {% if product.type != blank %}
+              <div class="product__type">
+                <span class="product__meta-label">{{ 'products.product.type' | t }}:</span>
+                <span class="product__meta-value">{{ product.type }}</span>
+              </div>
+            {% endif %}
+
+            {% if product.tags.size > 0 %}
+              <div class="product__tags">
+                <span class="product__meta-label">{{ 'products.product.tags' | t }}:</span>
+                <span class="product__meta-value">
+                  {% for tag in product.tags %}
+                    {{ tag }}{% unless forloop.last %}, {% endunless %}
+                  {% endfor %}
+                </span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="ProductVariantJson">
+  {{ product.variants | json }}
+</script>
