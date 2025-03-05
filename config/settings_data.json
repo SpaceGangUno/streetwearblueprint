@@ -1,0 +1,158 @@
+{
+  "current": {
+    "color_primary": "#000000",
+    "color_secondary": "#333333",
+    "color_tertiary": "#666666",
+    "color_background": "#ffffff",
+    "color_border": "#e6e6e6",
+    "color_button": "#000000",
+    "color_button_text": "#ffffff",
+    "color_button_hover": "#333333",
+    "font_heading": "helvetica_n4",
+    "font_body": "helvetica_n4",
+    "font_size_base": 16,
+    "font_size_heading_xl": 40,
+    "font_size_heading_large": 32,
+    "font_size_heading_medium": 24,
+    "font_size_heading_small": 18,
+    "spacing_unit": 16,
+    "border_radius": 0,
+    "container_width": 1200,
+    "logo_width": 150,
+    "show_announcement_bar": true,
+    "announcement_text": "Free shipping on all orders over $100",
+    "sticky_header": true,
+    "show_payment_icons": true,
+    "show_social_icons": true,
+    "show_newsletter": true,
+    "newsletter_heading": "Subscribe to our newsletter",
+    "newsletter_text": "Sign up for exclusive offers, original stories, events and more.",
+    "copyright_text": "© 2025 Streetwear Blueprint. All rights reserved.",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "menu": "main-menu"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "blocks": {
+          "footer_block_1": {
+            "type": "link_list",
+            "settings": {
+              "title": "Shop",
+              "menu": "footer"
+            }
+          },
+          "footer_block_2": {
+            "type": "link_list",
+            "settings": {
+              "title": "Information",
+              "menu": "footer-info"
+            }
+          },
+          "footer_block_3": {
+            "type": "text",
+            "settings": {
+              "title": "About Us",
+              "text": "<p>Streetwear Blueprint is a premium streetwear brand focused on quality, design, and sustainability.</p>"
+            }
+          }
+        },
+        "block_order": [
+          "footer_block_1",
+          "footer_block_2",
+          "footer_block_3"
+        ],
+        "settings": {
+        }
+      }
+    },
+    "content_for_index": [
+      "hero",
+      "featured-collection",
+      "image-with-text",
+      "newsletter"
+    ]
+  },
+  "presets": {
+    "Monochrome": {
+      "color_primary": "#000000",
+      "color_secondary": "#333333",
+      "color_tertiary": "#666666",
+      "color_background": "#ffffff",
+      "color_border": "#e6e6e6",
+      "color_button": "#000000",
+      "color_button_text": "#ffffff",
+      "color_button_hover": "#333333",
+      "font_heading": "helvetica_n4",
+      "font_body": "helvetica_n4",
+      "font_size_base": 16,
+      "font_size_heading_xl": 40,
+      "font_size_heading_large": 32,
+      "font_size_heading_medium": 24,
+      "font_size_heading_small": 18,
+      "spacing_unit": 16,
+      "border_radius": 0,
+      "container_width": 1200,
+      "logo_width": 150,
+      "show_announcement_bar": true,
+      "announcement_text": "Free shipping on all orders over $100",
+      "sticky_header": true,
+      "show_payment_icons": true,
+      "show_social_icons": true,
+      "show_newsletter": true,
+      "newsletter_heading": "Subscribe to our newsletter",
+      "newsletter_text": "Sign up for exclusive offers, original stories, events and more.",
+      "copyright_text": "© 2025 Streetwear Blueprint. All rights reserved.",
+      "sections": {
+        "header": {
+          "type": "header",
+          "settings": {
+            "menu": "main-menu"
+          }
+        },
+        "footer": {
+          "type": "footer",
+          "blocks": {
+            "footer_block_1": {
+              "type": "link_list",
+              "settings": {
+                "title": "Shop",
+                "menu": "footer"
+              }
+            },
+            "footer_block_2": {
+              "type": "link_list",
+              "settings": {
+                "title": "Information",
+                "menu": "footer-info"
+              }
+            },
+            "footer_block_3": {
+              "type": "text",
+              "settings": {
+                "title": "About Us",
+                "text": "<p>Streetwear Blueprint is a premium streetwear brand focused on quality, design, and sustainability.</p>"
+              }
+            }
+          },
+          "block_order": [
+            "footer_block_1",
+            "footer_block_2",
+            "footer_block_3"
+          ],
+          "settings": {
+          }
+        }
+      },
+      "content_for_index": [
+        "hero",
+        "featured-collection",
+        "image-with-text",
+        "newsletter"
+      ]
+    }
+  }
+}
